@@ -2,5 +2,5 @@ name = "calories-tracker"
 compatibility_date = "2024-01-01"
 
 [vars]
-NEXT_PUBLIC_SUPABASE_URL = "your_supabase_url"
-NEXT_PUBLIC_SUPABASE_ANON_KEY = "your_anon_key"
+NEXT_PUBLIC_SUPABASE_URL = "https://wgtwnwariyewllisjfvz.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndndHdud2FyaXlld2xsaXNqZnZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2MzU1NzIsImV4cCI6MjA5MTIxMTU3Mn0.ssHrkd5sdWoNh1hbwtsF74l0YNp98YrcGqf1Vc8_mTo"
