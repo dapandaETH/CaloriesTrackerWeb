@@ -13,6 +13,8 @@ export async function analyzeFood(imageBase64: string): Promise<{
   meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack'
   confidence_score: number
 }> {
+  const model = process.env.OPENROUTER_MODEL || 'openai/gpt-4o-mini'
+  
   const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -20,7 +22,7 @@ export async function analyzeFood(imageBase64: string): Promise<{
       'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
     },
     body: JSON.stringify({
-      model: process.env.OPENROUTER_MODEL || 'openai/gpt-4-vision-preview',
+      model: model,
       messages: [
         {
           role: 'user',
@@ -43,7 +45,8 @@ export async function analyzeFood(imageBase64: string): Promise<{
   })
 
   if (!response.ok) {
-    throw new Error('OpenRouter API error')
+    const errorText = await response.text()
+    throw new Error(`OpenRouter API error: ${response.status} - ${errorText}`)
   }
 
   const data: OpenRouterResponse = await response.json()

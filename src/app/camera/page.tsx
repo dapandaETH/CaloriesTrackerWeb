@@ -8,9 +8,11 @@ import Link from 'next/link'
 export default function CameraPage() {
   const router = useRouter()
   const [uploading, setUploading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleCapture = useCallback(async (file: File) => {
     setUploading(true)
+    setError(null)
     
     const formData = new FormData()
     formData.append('image', file)
@@ -21,14 +23,18 @@ export default function CameraPage() {
         body: formData,
       })
       
+      const data = await res.json()
+      
       if (res.ok) {
         router.push('/')
+      } else {
+        setError(data.error || 'Failed to analyze meal')
+        setUploading(false)
       }
     } catch (err) {
-      console.error('Upload failed:', err)
+      setError('Network error. Please try again.')
+      setUploading(false)
     }
-    
-    setUploading(false)
   }, [router])
 
   return (
@@ -49,9 +55,23 @@ export default function CameraPage() {
         </div>
       )}
 
-      <p className="text-center text-sm text-gray-500">
-        Point camera at your food and tap the button to capture
-      </p>
+      {error && (
+        <div className="text-center py-4">
+          <p className="text-red-600">{error}</p>
+          <button 
+            onClick={() => setError(null)}
+            className="mt-2 text-sm text-blue-600 underline"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
+      {!uploading && !error && (
+        <p className="text-center text-sm text-gray-500">
+          Point camera at your food and tap the button to capture
+        </p>
+      )}
     </div>
   )
 }

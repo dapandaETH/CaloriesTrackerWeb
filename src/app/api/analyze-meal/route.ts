@@ -12,14 +12,15 @@ export async function POST(request: Request) {
     }
 
     const bytes = await image.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-    const imageBase64 = buffer.toString('base64')
+    const uint8Array = new Uint8Array(bytes)
+    const binaryString = Array.from(uint8Array).map(byte => String.fromCharCode(byte)).join('')
+    const imageBase64 = btoa(binaryString)
 
     const analysis = await analyzeFood(imageBase64)
 
     const { data: imageData, error: uploadError } = await supabaseAdmin.storage
       .from('meal-photos')
-      .upload(`${Date.now()}.jpg`, buffer, {
+      .upload(`${Date.now()}.jpg`, uint8Array, {
         contentType: 'image/jpeg',
       })
 
@@ -53,6 +54,7 @@ export async function POST(request: Request) {
     return NextResponse.json(meal)
   } catch (error) {
     console.error('Error:', error)
-    return NextResponse.json({ error: 'Analysis failed' }, { status: 500 })
+    const message = error instanceof Error ? error.message : 'Analysis failed'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
