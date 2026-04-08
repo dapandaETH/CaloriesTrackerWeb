@@ -7,6 +7,9 @@ import { Meal } from '@/types'
 import CalorieProgress from '@/components/CalorieProgress'
 import MealCard from '@/components/MealCard'
 import EditMealModal from '@/components/EditMealModal'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Plus } from 'lucide-react'
 
 export default function Dashboard() {
   const [meals, setMeals] = useState<Meal[]>([])
@@ -59,32 +62,49 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+      <div className="animate-fade-up">
+        <h1 className="text-2xl font-bold tracking-tight">Good {getGreeting()}</h1>
+        <p className="text-muted-foreground mt-1">Track your nutrition journey</p>
+      </div>
       
-      <CalorieProgress current={totalCalories} goal={dailyGoal} />
+      <div className="animate-fade-up-delay-1">
+        <CalorieProgress current={totalCalories} goal={dailyGoal} />
+      </div>
       
-      <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold text-gray-900">Today's Meals</h2>
-        <Link
-          href="/camera"
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium"
-        >
-          + Add Meal
+      <div className="flex items-center justify-between animate-fade-up-delay-2">
+        <h2 className="text-lg font-semibold">Today's Meals</h2>
+        <Link href="/camera">
+          <Button size="sm" className="gap-1.5">
+            <Plus className="size-4" />
+            Add
+          </Button>
         </Link>
       </div>
 
       {loading ? (
-        <div className="text-center py-8 text-gray-500">Loading...</div>
+        <Card className="p-8">
+          <div className="flex flex-col items-center justify-center text-muted-foreground">
+            <div className="size-8 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
+            <p className="mt-3 text-sm">Loading meals...</p>
+          </div>
+        </Card>
       ) : meals.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
-          <p>No meals logged today</p>
-          <p className="text-sm mt-1">Tap the button above to add your first meal</p>
-        </div>
+        <Card className="p-8 animate-fade-up-delay-3">
+          <div className="text-center">
+            <div className="size-16 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center">
+              <span className="text-3xl">🍽️</span>
+            </div>
+            <p className="text-foreground font-medium">No meals logged today</p>
+            <p className="text-sm text-muted-foreground mt-1">Tap the button above to add your first meal</p>
+          </div>
+        </Card>
       ) : (
         <>
           <div className="space-y-3">
-            {meals.map((meal) => (
-              <MealCard key={meal.id} meal={meal} onDelete={handleDelete} onEdit={setEditingMeal} />
+            {meals.map((meal, index) => (
+              <div key={meal.id} className="animate-fade-up" style={{ animationDelay: `${index * 50}ms` }}>
+                <MealCard meal={meal} onDelete={handleDelete} onEdit={setEditingMeal} />
+              </div>
             ))}
           </div>
           {editingMeal && (
@@ -98,4 +118,11 @@ export default function Dashboard() {
       )}
     </div>
   )
+}
+
+function getGreeting() {
+  const hour = new Date().getHours()
+  if (hour < 12) return 'morning'
+  if (hour < 18) return 'afternoon'
+  return 'evening'
 }

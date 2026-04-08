@@ -4,6 +4,9 @@ import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import CameraView from '@/components/CameraView'
 import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { ArrowLeft } from 'lucide-react'
 
 export default function CameraPage() {
   const router = useRouter()
@@ -46,36 +49,45 @@ export default function CameraPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Add Meal</h1>
-        <Link href="/" className="text-gray-500">
-          Cancel
+      <div className="flex items-center justify-between animate-fade-up">
+        <h1 className="text-2xl font-bold tracking-tight">Add Meal</h1>
+        <Link href="/">
+          <Button variant="ghost" size="icon-sm">
+            <ArrowLeft className="size-4" />
+          </Button>
         </Link>
       </div>
 
-      <CameraView onCapture={handleCapture} />
+      <div className="animate-fade-up-delay-1">
+        <CameraView onCapture={handleCapture} />
+      </div>
 
       {uploading && (
-        <div className="text-center py-4">
-          <p className="text-gray-600">Analyzing your meal...</p>
-          <p className="text-sm text-gray-400 mt-1">This may take a moment</p>
-        </div>
+        <Card className="p-6 animate-fade-up-delay-2">
+          <div className="flex flex-col items-center justify-center text-center">
+            <div className="size-10 rounded-full border-2 border-primary/30 border-t-primary animate-spin mb-3" />
+            <p className="text-foreground font-medium">Analyzing your meal...</p>
+            <p className="text-sm text-muted-foreground mt-1">This may take a moment</p>
+          </div>
+        </Card>
       )}
 
       {error && (
-        <div className="text-center py-4">
-          <p className="text-red-600">{error}</p>
-          <button 
-            onClick={() => setError(null)}
-            className="mt-2 text-sm text-blue-600 underline"
-          >
-            Try again
-          </button>
-        </div>
+        <Card className="p-6 border-destructive/50 animate-fade-up-delay-2">
+          <div className="text-center">
+            <p className="text-destructive font-medium">{error}</p>
+            <button 
+              onClick={() => setError(null)}
+              className="mt-2 text-sm text-primary hover:text-primary/80 font-medium"
+            >
+              Try again
+            </button>
+          </div>
+        </Card>
       )}
 
       {!uploading && !error && (
-        <p className="text-center text-sm text-gray-500">
+        <p className="text-center text-sm text-muted-foreground animate-fade-up-delay-2">
           Point camera at your food and tap the button to capture
         </p>
       )}

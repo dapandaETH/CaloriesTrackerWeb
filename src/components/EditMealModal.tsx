@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { Meal, MealType } from '@/types'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 interface EditMealModalProps {
   meal: Meal
@@ -46,95 +49,107 @@ export default function EditMealModal({ meal, onClose, onSave }: EditMealModalPr
     setSaving(false)
   }
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div 
-        className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      <div className="relative w-full max-w-md mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-        <div className="bg-gradient-to-r from-orange-500 to-amber-500 px-6 py-4">
-          <h2 className="text-xl font-semibold text-white">Edit Meal</h2>
-        </div>
-        
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Food Name</label>
-            <input
-              type="text"
-              value={formData.food_name}
-              onChange={(e) => setFormData({ ...formData, food_name: e.target.value })}
-              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all outline-none"
-              required
-            />
-          </div>
+  const mealTypes: MealType[] = ['breakfast', 'lunch', 'dinner', 'snack']
 
-          <div className="grid grid-cols-2 gap-4">
+  return (
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-semibold">Edit Meal</DialogTitle>
+        </DialogHeader>
+        
+        <form onSubmit={handleSubmit} className="space-y-5 mt-2">
+          <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Estimated Calories</label>
+              <label className="block text-sm font-medium text-foreground mb-1.5">
+                Food Name
+              </label>
               <input
-                type="number"
-                value={formData.estimated_calories}
-                onChange={(e) => setFormData({ ...formData, estimated_calories: parseInt(e.target.value) || 0 })}
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all outline-none"
+                type="text"
+                value={formData.food_name}
+                onChange={(e) => setFormData({ ...formData, food_name: e.target.value })}
+                className="w-full px-4 py-2.5 rounded-xl border border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
                 required
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Actual Calories</label>
-              <input
-                type="number"
-                value={formData.actual_calories}
-                onChange={(e) => setFormData({ ...formData, actual_calories: e.target.value })}
-                placeholder="Optional"
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all outline-none"
-              />
-            </div>
-          </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Portion Size</label>
-              <input
-                type="text"
-                value={formData.portion_size}
-                onChange={(e) => setFormData({ ...formData, portion_size: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all outline-none"
-              />
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">
+                  Estimated
+                </label>
+                <input
+                  type="number"
+                  value={formData.estimated_calories}
+                  onChange={(e) => setFormData({ ...formData, estimated_calories: parseInt(e.target.value) || 0 })}
+                  className="w-full px-4 py-2.5 rounded-xl border border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">
+                  Actual
+                </label>
+                <input
+                  type="number"
+                  value={formData.actual_calories}
+                  onChange={(e) => setFormData({ ...formData, actual_calories: e.target.value })}
+                  placeholder="Optional"
+                  className="w-full px-4 py-2.5 rounded-xl border border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
+                />
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Meal Type</label>
-              <select
-                value={formData.meal_type}
-                onChange={(e) => setFormData({ ...formData, meal_type: e.target.value as MealType })}
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all outline-none bg-white"
-              >
-                <option value="breakfast">Breakfast</option>
-                <option value="lunch">Lunch</option>
-                <option value="dinner">Dinner</option>
-                <option value="snack">Snack</option>
-              </select>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">
+                  Portion
+                </label>
+                <input
+                  type="text"
+                  value={formData.portion_size}
+                  onChange={(e) => setFormData({ ...formData, portion_size: e.target.value })}
+                  className="w-full px-4 py-2.5 rounded-xl border border-input bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1.5">
+                  Type
+                </label>
+                <select
+                  value={formData.meal_type}
+                  onChange={(e) => setFormData({ ...formData, meal_type: e.target.value as MealType })}
+                  className="w-full px-4 py-2.5 rounded-xl border border-input bg-background text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all appearance-none"
+                >
+                  {mealTypes.map((type) => (
+                    <option key={type} value={type} className="capitalize">
+                      {type}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 
           <div className="flex gap-3 pt-2">
-            <button
+            <Button
               type="button"
+              variant="outline"
               onClick={onClose}
-              className="flex-1 px-4 py-3 rounded-lg border border-gray-200 text-gray-600 font-medium hover:bg-gray-50 transition-colors"
+              className="flex-1"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={saving}
-              className="flex-1 px-4 py-3 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 text-white font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+              className="flex-1 bg-primary hover:bg-primary/90"
             >
               {saving ? 'Saving...' : 'Save Changes'}
-            </button>
+            </Button>
           </div>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }

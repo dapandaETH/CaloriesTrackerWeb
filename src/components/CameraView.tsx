@@ -1,6 +1,9 @@
 'use client'
 
 import { useRef, useState, useCallback } from 'react'
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Camera } from 'lucide-react'
 
 interface CameraViewProps {
   onCapture: (file: File) => void
@@ -45,37 +48,42 @@ export default function CameraView({ onCapture }: CameraViewProps) {
   }, [stream, onCapture])
 
   return (
-    <div className="relative h-[60vh] bg-black rounded-2xl overflow-hidden">
-      {!stream && !error && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <button
-            onClick={startCamera}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium"
-          >
-            Start Camera
-          </button>
-        </div>
-      )}
-      
-      {error && (
-        <div className="absolute inset-0 flex items-center justify-center text-white text-center p-4">
-          <p>{error}</p>
-        </div>
-      )}
+    <Card className="overflow-hidden">
+      <div className="relative h-[60vh] bg-black">
+        {!stream && !error && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Button onClick={startCamera} size="lg" className="gap-2">
+              <Camera className="size-5" />
+              Start Camera
+            </Button>
+          </div>
+        )}
+        
+        {error && (
+          <div className="absolute inset-0 flex items-center justify-center text-white text-center p-6">
+            <div>
+              <p className="text-lg font-medium">{error}</p>
+              <Button onClick={startCamera} variant="outline" className="mt-4">
+                Retry
+              </Button>
+            </div>
+          </div>
+        )}
 
-      <video
-        ref={videoRef}
-        autoPlay
-        playsInline
-        className={`w-full h-full object-cover ${!stream ? 'hidden' : ''}`}
-      />
-
-      {stream && (
-        <button
-          onClick={capturePhoto}
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 w-16 h-16 bg-white rounded-full border-4 border-blue-600"
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          className={`size-full object-cover ${!stream ? 'hidden' : ''}`}
         />
-      )}
-    </div>
+
+        {stream && (
+          <button
+            onClick={capturePhoto}
+            className="absolute bottom-6 left-1/2 -translate-x-1/2 size-16 rounded-full bg-white ring-4 ring-primary/30 transition-transform hover:scale-105 active:scale-95"
+          />
+        )}
+      </div>
+    </Card>
   )
 }
