@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     const { data: meal, error: dbError } = await supabaseAdmin
       .from('meals')
       .insert({
-        user_id: 'anonymous',
+        user_id: '00000000-0000-0000-0000-000000000000',
         image_url: urlData.publicUrl,
         food_name: analysis.food_name,
         estimated_calories: analysis.calories,

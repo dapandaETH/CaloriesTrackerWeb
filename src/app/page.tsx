@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { Meal } from '@/types'
@@ -12,22 +12,38 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [dailyGoal] = useState(2000)
 
-  useEffect(() => {
-    async function fetchMeals() {
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
-      
-      const { data } = await supabase
-        .from('meals')
-        .select('*')
-        .gte('consumed_at', today.toISOString())
-        .order('consumed_at', { ascending: false })
-      
-      if (data) setMeals(data)
-      setLoading(false)
-    }
-    fetchMeals()
+  const fetchMeals = useCallback(async () => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    
+    const { data } = await supabase
+      .from('meals')
+      .select('*')
+      .gte('consumed_at', today.toISOString())
+      .order('consumed_at', { ascending: false })
+    
+    if (data) setMeals(data)
+    setLoading(false)
   }, [])
+
+  useEffect(() => {
+    fetchMeals()
+  }, [fetchMeals])
+
+  useEffect(() => {
+    const handleFocus = () => fetchMeals()
+    window.addEventListener('focus', handleFocus)
+    return () => window.removeEventListener('focus', handleFocus)
+  }, [fetchMeals])
+
+  const handleDelete = async (id: string) => {
+    const res = await fetch(`/api/meals/${id}`, { method: 'DELETE' })
+    if (res.ok) {
+      setMeals((prev) => prev.filter((m) => m.id !== id))
+    } else {
+      alert('Failed to delete meal')
+    }
+  }
 
   const totalCalories = meals.reduce(
     (sum, m) => sum + (m.actual_calories ?? m.estimated_calories),
@@ -60,7 +76,7 @@ export default function Dashboard() {
       ) : (
         <div className="space-y-3">
           {meals.map((meal) => (
-            <MealCard key={meal.id} meal={meal} />
+            <MealCard key={meal.id} meal={meal} onDelete={handleDelete} />
           ))}
         </div>
       )}
