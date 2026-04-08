@@ -13,7 +13,7 @@ export async function analyzeFood(imageBase64: string): Promise<{
   meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack'
   confidence_score: number
 }> {
-  const model = process.env.OPENROUTER_MODEL || 'openai/gpt-4o-mini'
+  const model = process.env.OPENROUTER_MODEL || 'qwen/qwen3-vl-8b-instruct'
   
   const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
