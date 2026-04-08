@@ -6,11 +6,13 @@ import { supabase } from '@/lib/supabase'
 import { Meal } from '@/types'
 import CalorieProgress from '@/components/CalorieProgress'
 import MealCard from '@/components/MealCard'
+import EditMealModal from '@/components/EditMealModal'
 
 export default function Dashboard() {
   const [meals, setMeals] = useState<Meal[]>([])
   const [loading, setLoading] = useState(true)
   const [dailyGoal] = useState(2000)
+  const [editingMeal, setEditingMeal] = useState<Meal | null>(null)
 
   const fetchMeals = useCallback(async () => {
     const today = new Date()
@@ -45,6 +47,11 @@ export default function Dashboard() {
     }
   }
 
+  const handleEditSave = (updated: Meal) => {
+    setMeals((prev) => prev.map((m) => m.id === updated.id ? updated : m))
+    setEditingMeal(null)
+  }
+
   const totalCalories = meals.reduce(
     (sum, m) => sum + (m.actual_calories ?? m.estimated_calories),
     0
@@ -74,11 +81,20 @@ export default function Dashboard() {
           <p className="text-sm mt-1">Tap the button above to add your first meal</p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {meals.map((meal) => (
-            <MealCard key={meal.id} meal={meal} onDelete={handleDelete} />
-          ))}
-        </div>
+        <>
+          <div className="space-y-3">
+            {meals.map((meal) => (
+              <MealCard key={meal.id} meal={meal} onDelete={handleDelete} onEdit={setEditingMeal} />
+            ))}
+          </div>
+          {editingMeal && (
+            <EditMealModal
+              meal={editingMeal}
+              onClose={() => setEditingMeal(null)}
+              onSave={handleEditSave}
+            />
+          )}
+        </>
       )}
     </div>
   )
