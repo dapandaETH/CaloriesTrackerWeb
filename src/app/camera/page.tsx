@@ -25,12 +25,19 @@ export default function CameraPage() {
       
       const data = await res.json()
       
-      if (res.ok) {
-        router.push('/')
-      } else {
+      if (!res.ok) {
         setError(data.error || 'Failed to analyze meal')
         setUploading(false)
+        return
       }
+
+      if (!data || !data.id) {
+        setError('Invalid response from server')
+        setUploading(false)
+        return
+      }
+
+      router.push('/')
     } catch (err) {
       setError('Network error. Please try again.')
       setUploading(false)

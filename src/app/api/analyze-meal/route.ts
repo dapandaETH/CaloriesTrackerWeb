@@ -26,17 +26,22 @@ export async function POST(request: Request) {
 
     if (uploadError) {
       console.error('Upload error:', uploadError)
+      return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 })
     }
 
     const { data: urlData } = supabaseAdmin.storage
       .from('meal-photos')
       .getPublicUrl(imageData?.path || '')
 
+    if (!urlData?.publicUrl) {
+      return NextResponse.json({ error: 'Failed to get image URL' }, { status: 500 })
+    }
+
     const { data: meal, error: dbError } = await supabaseAdmin
       .from('meals')
       .insert({
         user_id: 'anonymous',
-        image_url: urlData.publicUrl || '',
+        image_url: urlData.publicUrl,
         food_name: analysis.food_name,
         estimated_calories: analysis.calories,
         portion_size: analysis.portion_size,
@@ -49,6 +54,11 @@ export async function POST(request: Request) {
 
     if (dbError) {
       console.error('DB error:', dbError)
+      return NextResponse.json({ error: 'Failed to save meal' }, { status: 500 })
+    }
+
+    if (!meal) {
+      return NextResponse.json({ error: 'Meal not created' }, { status: 500 })
     }
 
     return NextResponse.json(meal)
